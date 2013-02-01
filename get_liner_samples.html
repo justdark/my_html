@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<style>
+
+	.top{margin:20px 0;}
+	.top input{width:25px;height:25px;border:1px solid #fff;border-radius:4px;background:#ddd;}
+	.top .i1{background:#000000;}
+	.top .i2{background:#FF0000;}
+	.top .i3{background:#80FF00;}
+	.top .i4{background:#00FFFF;}
+	.top .i5{background:#808080;}
+	.top .i6{background:#FF8000;}
+	.top .i7{background:#408080;}
+	.top .i8{background:#8000FF;}
+	.top .i9{background:#CCCC00;}
+
+
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" /> </script>
+
+<canvas id="controlCanvas" height="519" width="1035" ></canvas>
+<br>
+<input id="widths"  type="text">宽</input>
+<input id="heights"  type="text">高</input>
+<button id="changeSize">变化大小</button>
+<button id="getit">生成数据</button>
+<div class="top">
+
+<div id="color">
+            请选择点的颜色：
+            <input class="i1" id="c1" type="button" value="0" />
+            <input class="i2" id="c2" type="button" value="1" />
+            <input class="i3" id="c3" type="button" value="2" />
+            <input class="i4" id="c4" type="button" value="3" />
+            <input class="i5" id="c5" type="button" value="4" />
+            <input class="i6" id="c6" type="button" value="5" />
+            <input class="i7" id="c7" type="button" value="6" />
+            <input class="i8" id="c8" type="button" value="7" />
+            <input class="i9" id="c9" type="button" value="8" />
+	
+</div>
+
+</div>
+
+<input type="checkbox" id="add1" checked="checked">是否在坐标前加一个1</input>
+<input type="checkbox" id="reg" checked="checked">输出为regression模式(y为纵坐标)</input>
+<input type="checkbox" id="log">输出为logistic模式(y为分类标号)</input>
+<br>
+<textarea cols="100" id="result" rows="20" ></textarea>
+<title></title>
+  </head>
+<script type="text/javascript" src="jquery-1.6.4.min.js" /> </script>
+<script type="text/javascript">
+var dot=new Array();
+var colors=new Array("#000000","#FF0000","#80FF00","#00FFFF","#808080","#FF8000","#408080","#8000FF","#CCCC00");
+var now_color=0;
+$(function(){
+init();
+$("#changeSize").click(function(){
+if ($("#heights").val()!="" && $("#widths").val()!="")
+{
+$("#controlCanvas").attr("height",Math.abs($("#heights").val())*20+40);
+$("#controlCanvas").attr("width",Math.abs($("#widths").val())*20+40);
+
+init();
+var canvas = document.getElementById("controlCanvas"); 
+var context = canvas.getContext("2d");
+stage_info = canvas.getBoundingClientRect(); 
+
+for (var i=0;i<dot.length;i++)
+{
+
+cxt=context;
+cxt.fillStyle=colors[dot[i].c];
+cxt.beginPath();
+cxt.arc(dot[i].x,stage_info.bottom-dot[i].y-8,5,0,Math.PI*2,true);
+
+cxt.closePath();
+cxt.fill();
+//alert("Demo的位置是X:"+(dot[i].x-20)/20.0+";Y:"+(dot[i].y-20)/20.0);
+}
+} else alert("come on!  some data is needed!!");
+});
+$("#c1").click(function(){now_color=$("#c1").attr("value");});
+$("#c2").click(function(){now_color=$("#c2").attr("value");});
+$("#c3").click(function(){now_color=$("#c3").attr("value");});
+$("#c4").click(function(){now_color=$("#c4").attr("value");});
+$("#c5").click(function(){now_color=$("#c5").attr("value");});
+$("#c6").click(function(){now_color=$("#c6").attr("value");});
+$("#c7").click(function(){now_color=$("#c7").attr("value");});
+$("#c8").click(function(){now_color=$("#c8").attr("value");});
+$("#c9").click(function(){now_color=$("#c9").attr("value");});
+
+
+$("#getit").click(function(){
+  if ($("#log").attr("checked"))
+  {
+	  var s="X=[\n";
+	  
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"]]\n\n\n";
+		 
+	  s+="y=[\n"
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+dot[i].c+"],\n";
+	  }
+		 s+="["+dot[i].c+"]]";
+		 
+	  $("#result").attr("value",s);
+	  
+  }
+  else
+
+  if ($("#reg").attr("checked"))
+  {
+	  var s="X=[\n";
+	  
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+"]]\n\n\n";
+		 
+	  s+="y=[\n"
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+(dot[i].y-20)/20.0+"],\n";
+	  }
+		 s+="["+(dot[i].y-20)/20.0+"]]";
+		 
+	  $("#result").attr("value",s);
+	  
+  }
+
+
+
+});
+})
+
+function init() 
+{
+
+var canvas = document.getElementById("controlCanvas"); 
+var context = canvas.getContext("2d"); 
+var canvasWidth=$(canvas).attr("width");//获取canvas的宽度
+
+var canvasHeight=$(canvas).attr("Height");//获取canvas的高度
+var canvasWidthFloat=canvasWidth%20; //防止canvas宽度不是20的倍数，要不然绘制的坐标点会有问题
+var canvasHeightFloat=canvasHeight%20; //防止canvas高度不是20的倍数，要不然绘制的坐标点会有问题
+//绘制y轴平行线
+canvas.onmousedown = function(event) {
+            drawBegin(event);
+        };
+		
+function  drawBegin(e) {
+
+            stage_info = canvas.getBoundingClientRect();
+			var X= (e.clientX-stage_info.left);
+            var Y= (e.clientY-stage_info.top);
+			var yy=(stage_info.bottom-e.clientY);
+			
+			
+cxt=context;
+cxt.fillStyle=colors[now_color];
+cxt.beginPath();
+cxt.arc(X,Y,5,0,Math.PI*2,true);
+cxt.closePath();
+cxt.fill();
+dot[dot.length]={x:X,y:yy,c:now_color};
+
+			// alert("Demo的位置是X:"+dot[dot.length-1].x+";Y:"+yy);
+    }
+
+for ( var x = 20; x <canvasWidth-20; x += 20) { 
+context.moveTo(x, canvasHeightFloat); 
+context.lineTo(x, canvasHeight-20); 
+} 
+//绘制x轴平行线
+for ( var y = 20; y <canvasHeight-20; y += 20) { 
+context.moveTo(20, y+canvasHeightFloat); 
+context.lineTo(canvasWidth-20, y+canvasHeightFloat); 
+} 
+context.strokeStyle = "#ddd"; 
+context.stroke(); 
+context.beginPath(); 
+//画横坐标 
+context.moveTo(20, canvasHeight-20); 
+context.lineTo(canvasWidth-20, canvasHeight-20); 
+context.moveTo(canvasWidth-35, canvasHeight-30); 
+context.lineTo(canvasWidth-20, canvasHeight-20); 
+context.lineTo(canvasWidth-35, canvasHeight-10); 
+//画纵坐标 
+context.moveTo(20, canvasHeight-20); 
+context.lineTo(20, canvasHeightFloat); 
+context.moveTo(10, canvasHeightFloat+15); 
+context.lineTo(20, canvasHeightFloat); 
+context.lineTo(30, canvasHeightFloat+15);
+
+
+
+context.strokeStyle = "#000"; 
+context.stroke(); 
+var yvalue=0
+var yvalueMax=parseInt((canvasHeight-20)/20)
+//这样你的y坐标就不会受到canvas变法而烦恼了
+for(var x=20;x<canvasHeight;x+=20)
+{
+if(yvalue==yvalueMax)
+break;
+context.fillText(yvalue++,5,canvasHeight-x+3);//让y轴的值向下移动3px，让y值显示在平行线的中间
+}
+//x轴坐标，这里修复了一下canvas不是20倍数以后，坐标点为移动的问题 -_-!经过测试，无论你怎么调整都没事哦
+var xvalue=parseInt((canvasWidth-20)/20)-1
+for(var y=20;y<canvasWidth;y+=20)
+{
+if(xvalue==0)
+break;
+context.fillText(xvalue--,canvasWidth-y-canvasWidthFloat-3,canvasHeight-5);//让x轴的值向右移动3px，让x值显示在平行线的中间
+}
+
+}
+
+
+</script>
+  
+</html>
