@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+<style>
+
+	.top{margin:1px 0;}
+	.top input{width:25px;height:25px;border:1px solid #fff;border-radius:4px;background:#ddd;}
+	.top .i1{background:#000000;}
+	.top .i2{background:#FF0000;}
+	.top .i3{background:#80FF00;}
+	.top .i4{background:#00FFFF;}
+	.top .i5{background:#808080;}
+	.top .i6{background:#FF8000;}
+	.top .i7{background:#408080;}
+	.top .i8{background:#8000FF;}
+	.clear
+	{	clear: both;
+		overflow: hidden;
+		height: 0}
+	#jsddm
+{	margin: 0;
+	padding: 0}
+
+	#jsddm li
+	{	float: left;
+		list-style: none;
+		font: 18px Tahoma, Arial}
+
+	#jsddm li a
+	{	display: block;
+		background: #324143;
+		padding: 5px 18px;
+		text-decoration: none;
+		border-right: 1px solid white;
+		width: 90px;
+		color: #EAFFED;
+		white-space: nowrap}
+
+	#jsddm li a:hover
+	{	background: #24313C}
+	#jsddm li button:hover
+	{	background: #24313C}	
+		#jsddm li ul
+		{	margin: 0;
+			padding: 0;
+			position: absolute;
+			visibility: hidden;
+			border-top: 1px solid white}
+		
+			#jsddm li ul li
+			{	float: none;
+				display: inline}
+			
+			#jsddm li ul li a
+			{	width: auto;
+				background: #A9C251;
+				color: #24313C}
+			
+			#jsddm li ul li a:hover
+			{	background: #8EA344}
+
+</style>
+<script type="text/javascript" src="jquery.min.js" /> </script>
+
+<ul id="jsddm">
+	<li><a href="#">Color Class</a>
+		<ul>
+			<div class="top">
+
+<div id="color">
+            <input class="i1" id="c1" type="button" value="0" />
+            <input class="i2" id="c2" type="button" value="1" />
+            <input class="i3" id="c3" type="button" value="2" />
+            <input class="i4" id="c4" type="button" value="3" />
+			<br>
+            <input class="i5" id="c5" type="button" value="4" />
+            <input class="i6" id="c6" type="button" value="5" />
+            <input class="i7" id="c7" type="button" value="6" />
+            <input class="i8" id="c8" type="button" value="7" />
+	
+</div>
+
+</div>
+		</ul>
+	</li>
+	<li><a href="#">Generate</a>
+		<ul>
+			<li><button class="positive" id="A">Generate full Data </button></li>
+			<li><button class="positive" id="X">Generate X </button></li>
+			<li><button class="positive" id="Y">Generate y </button></li>
+		</ul>
+	</li>
+	<li><a href="#">Setting</a>
+		<ul>
+			<li><button class="positive" id="changeSize">Change The Grid Size</button></li>
+			<li><button type="submit" class="positive" name="save" id="add1button">
+				<input type="checkbox" id="add1" checked="checked" ></input>
+					Add a bias term w0=1  before data
+				</button>
+			</li>
+			<li><button type="submit" class="positive" name="save" id="regbutton">
+				<input type="checkbox" id="reg" checked="checked"></input>
+					Output as regression style (y is number of Y-axis)
+				</button>
+			</li>
+			<li><button type="submit" class="positive" name="save" id="logbutton">
+				<input type="checkbox" id="log"></input>
+					Output as logistic style(y is respect number for different color)
+				</button>
+			</li>
+		</ul>
+	</li>
+	<li><a href="#">About</a></li>
+	<li><a href="#">//////////////</a></li><li><a href="#">//////////////</a></li><li><a href="#">//////////////</a></li>
+</ul>
+<div class="clear"> </div>
+<br>
+<canvas id="controlCanvas" height="359" width="819" ></canvas>
+<textarea cols="105" id="result" rows="6" ></textarea>
+<title></title>
+  </head>
+<script type="text/javascript" src="jquery-1.6.4.min.js" /> </script>
+
+<script type="text/javascript">
+
+var dot=new Array();
+var colors=new Array("#000000","#FF0000","#80FF00","#00FFFF","#808080","#FF8000","#408080","#8000FF","#CCCC00");
+var now_color=0;
+$(function(){
+init();
+
+
+
+$("#add1button").click(function(){
+    $("#add1").click();
+});
+$("#logbutton").click(function(){
+    $("#log").click();
+});
+$("#regbutton").click(function(){
+    $("#reg").click();
+});
+
+$("#changeSize").click(function(){
+var heightval=prompt("New Height(empty means don't change)");
+var widthval=prompt("New Width(empty means don't change)");
+if (heightval=="")
+{
+   heightval=$("#controlCanvas").attr("height");
+} else
+{
+   heightval=  Math.abs(heightval)*20+40;
+}
+if (widthval=="")
+{
+    widthval=$("#controlCanvas").attr("width");
+} else
+{
+    widthval=Math.abs(widthval)*20+40
+}
+
+
+$("#controlCanvas").attr("height",heightval);
+$("#controlCanvas").attr("width",widthval);
+init();
+var canvas = document.getElementById("controlCanvas"); 
+var context = canvas.getContext("2d");
+stage_info = canvas.getBoundingClientRect(); 
+
+for (var i=0;i<dot.length;i++)
+{
+
+cxt=context;
+cxt.fillStyle=colors[dot[i].c];
+cxt.beginPath();
+cxt.arc(dot[i].x,stage_info.bottom-dot[i].y-8,5,0,Math.PI*2,true);
+
+cxt.closePath();
+cxt.fill();
+//alert("Demo的位置是X:"+(dot[i].x-20)/20.0+";Y:"+(dot[i].y-20)/20.0);
+}
+
+}
+);
+
+$("#c1").click(function(){now_color=$("#c1").attr("value");});
+$("#c2").click(function(){now_color=$("#c2").attr("value");});
+$("#c3").click(function(){now_color=$("#c3").attr("value");});
+$("#c4").click(function(){now_color=$("#c4").attr("value");});
+$("#c5").click(function(){now_color=$("#c5").attr("value");});
+$("#c6").click(function(){now_color=$("#c6").attr("value");});
+$("#c7").click(function(){now_color=$("#c7").attr("value");});
+$("#c8").click(function(){now_color=$("#c8").attr("value");});
+$("#c9").click(function(){now_color=$("#c9").attr("value");});
+
+
+function getX()
+{  
+if ($("#log").attr("checked"))
+  {
+	  var s="[";
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"]]\n";
+	  return s;
+  }
+  else
+  if ($("#reg").attr("checked"))
+  {
+	  var s="[";
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+"]]\n";
+	  return s; 
+  }
+}
+function gety()
+{
+if ($("#log").attr("checked"))
+  {
+	  var s="";
+	  s+="["
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+dot[i].c+"],\n";
+	  }
+		 s+="["+dot[i].c+"]]";
+	  return s;
+  }
+  else
+  if ($("#reg").attr("checked"))
+  {
+	  var s="";
+	  s+="["
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+(dot[i].y-20)/20.0+"],\n";
+	  }
+		 s+="["+(dot[i].y-20)/20.0+"]]";
+	  return s;
+  }
+}
+
+
+
+$("#A").click(function(){
+var s=getX();
+s="X="+s;
+s=s+"y="+gety();
+$("#result").attr("value",s);
+setClipboard(s);
+
+});
+$("#X").click(function(){
+ var s=getX();
+ $("#result").attr("value",s);
+ setClipboard(s);
+
+ });
+$("#Y").click(function(){
+ var s=gety();
+ $("#result").attr("value",s);
+ setClipboard(s);
+});
+$("#getit").click(function(){
+  if ($("#log").attr("checked"))
+  {
+	  var s="X=[\n";
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+","+(dot[i].y-20)/20.0+"]]\n\n\n";
+		 
+	  s+="y=[\n"
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+dot[i].c+"],\n";
+	  }
+		 s+="["+dot[i].c+"]]";
+		 
+	  $("#result").attr("value",s);
+	  
+  }
+  else
+
+  if ($("#reg").attr("checked"))
+  {
+	  var s="X=[\n";
+	  
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+	  s+='[';
+	    if ($("#add1").attr("checked"))
+		{
+		 s=s+'1,';
+		 }
+		 s+=(dot[i].x-20)/20.0+"],\n";
+	  }
+	   s+='[';
+	  if ($("#add1").attr("checked"))
+		 s=s+'1,';
+		 s+=(dot[i].x-20)/20.0+"]]\n\n\n";
+		 
+	  s+="y=[\n"
+	  for (var i=0;i<dot.length-1;i++)
+	  {
+		 s+="["+(dot[i].y-20)/20.0+"],\n";
+	  }
+		 s+="["+(dot[i].y-20)/20.0+"]]";
+		 
+	  $("#result").attr("value",s);
+	  
+  }
+});
+})
+
+function init() 
+{
+var timeout         = 500;
+var closetimer		= 0;
+var ddmenuitem      = 0;
+
+function jsddm_open()
+{	jsddm_canceltimer();
+	jsddm_close();
+	ddmenuitem = $(this).find('ul').eq(0).css('visibility', 'visible');}
+
+function jsddm_close()
+{	if(ddmenuitem) ddmenuitem.css('visibility', 'hidden');}
+
+function jsddm_timer()
+{	closetimer = window.setTimeout(jsddm_close, timeout);}
+
+function jsddm_canceltimer()
+{	if(closetimer)
+	{	window.clearTimeout(closetimer);
+		closetimer = null;}}
+$(document).ready(function()
+{	$('#jsddm > li').bind('mouseover', jsddm_open);
+	$('#jsddm > li').bind('mouseout',  jsddm_timer);});
+document.onclick = jsddm_close;
+
+var canvas = document.getElementById("controlCanvas"); 
+var context = canvas.getContext("2d"); 
+var canvasWidth=$(canvas).attr("width");//获取canvas的宽度
+
+var canvasHeight=$(canvas).attr("Height");//获取canvas的高度
+var canvasWidthFloat=canvasWidth%20; //防止canvas宽度不是20的倍数，要不然绘制的坐标点会有问题
+var canvasHeightFloat=canvasHeight%20; //防止canvas高度不是20的倍数，要不然绘制的坐标点会有问题
+//绘制y轴平行线
+canvas.onmousedown = function(event) {
+            drawBegin(event);
+        };
+		
+function  drawBegin(e) {
+
+            stage_info = canvas.getBoundingClientRect();
+			var X= (e.clientX-stage_info.left);
+            var Y= (e.clientY-stage_info.top);
+			var yy=(stage_info.bottom-e.clientY);
+			
+			
+cxt=context;
+cxt.fillStyle=colors[now_color];
+cxt.beginPath();
+cxt.arc(X,Y,5,0,Math.PI*2,true);
+cxt.closePath();
+cxt.fill();
+dot[dot.length]={x:X,y:yy,c:now_color};
+
+			// alert("Demo的位置是X:"+dot[dot.length-1].x+";Y:"+yy);
+    }
+
+for ( var x = 20; x <canvasWidth-20; x += 20) { 
+context.moveTo(x, canvasHeightFloat); 
+context.lineTo(x, canvasHeight-20); 
+} 
+//绘制x轴平行线
+for ( var y = 20; y <canvasHeight-20; y += 20) { 
+context.moveTo(20, y+canvasHeightFloat); 
+context.lineTo(canvasWidth-20, y+canvasHeightFloat); 
+} 
+context.strokeStyle = "#ddd"; 
+context.stroke(); 
+context.beginPath(); 
+//画横坐标 
+context.moveTo(20, canvasHeight-20); 
+context.lineTo(canvasWidth-20, canvasHeight-20); 
+context.moveTo(canvasWidth-35, canvasHeight-30); 
+context.lineTo(canvasWidth-20, canvasHeight-20); 
+context.lineTo(canvasWidth-35, canvasHeight-10); 
+//画纵坐标 
+context.moveTo(20, canvasHeight-20); 
+context.lineTo(20, canvasHeightFloat); 
+context.moveTo(10, canvasHeightFloat+15); 
+context.lineTo(20, canvasHeightFloat); 
+context.lineTo(30, canvasHeightFloat+15);
+
+
+
+context.strokeStyle = "#000"; 
+context.stroke(); 
+var yvalue=0
+var yvalueMax=parseInt((canvasHeight-20)/20)
+//这样你的y坐标就不会受到canvas变法而烦恼了
+for(var x=20;x<canvasHeight;x+=20)
+{
+if(yvalue==yvalueMax)
+break;
+context.fillText(yvalue++,5,canvasHeight-x+3);//让y轴的值向下移动3px，让y值显示在平行线的中间
+}
+//x轴坐标，这里修复了一下canvas不是20倍数以后，坐标点为移动的问题 -_-!经过测试，无论你怎么调整都没事哦
+var xvalue=parseInt((canvasWidth-20)/20)-1
+for(var y=20;y<canvasWidth;y+=20)
+{
+if(xvalue==0)
+break;
+context.fillText(xvalue--,canvasWidth-y-canvasWidthFloat-3,canvasHeight-5);//让x轴的值向右移动3px，让x值显示在平行线的中间
+}
+
+}
+
+</script>
+  
+</html>
