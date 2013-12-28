@@ -1,0 +1,12 @@
+{
+    "main": "main.html",                             
+    "name": "linear-sample-generate",                          
+    "description": "demo app of node-webkit",   
+    "version": "0.1.0",                     
+    "keywords": [ "2d", "machine-learning" ],            /* APP的关键字，搜索APP时用到 */
+    "window": {                                      
+        "toolbar": false,
+        "width": 910,                                 /* 窗口初始化大小 */
+        "height": 550
+    }
+}
